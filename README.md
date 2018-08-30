@@ -3,35 +3,44 @@
 #### 项目介绍
 基于Layui的图标选择器，支持查询、点击回调等功能，提供手动选择图标事件。注：图标来自于Layui2.4.1 
 
-#### 软件架构
-软件架构说明
+#### 效果图
+![输入图片说明](https://images.gitee.com/uploads/images/2018/0830/235644_7c9ab176_1157021.gif "b.gif")
+![输入图片说明](https://images.gitee.com/uploads/images/2018/0830/235651_a9f30be3_1157021.gif "c.gif")
+
+#### 使用示例
+
+```
+    <input type="text" id="iconPicker" lay-filter="iconPicker" class="layui-input">
+```
+
+```
+    layui.use(['iconPicker'], function () {
+        var iconPicker = layui.iconPicker;
+            
+            iconPicker.render({
+                // 选择器，推荐使用input
+                elem: '#iconPicker',
+                // 数据类型：fontClass/unicode，推荐使用fontClass
+                type: 'fontClass',
+                // 是否开启搜索：true/false
+                search: true,
+                // 点击回调
+                click: function (data) {
+                    console.log(data);
+                }
+            });
+
+            /**
+             * 选中图标 （常用于更新时默认选中图标）
+             * @param filter lay-filter
+             * @param iconName 图标名称，自动识别fontClass/unicode
+             */
+            iconPicker.checkIcon('iconPicker', 'layui-icon-star-fill');
+
+    });
+```
 
 
-#### 安装教程
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 使用说明
-
-1. xxxx
-2. xxxx
-3. xxxx
-
-#### 参与贡献
-
-1. Fork 本项目
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
-
-
-#### 码云特技
-
-1. 使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2. 码云官方博客 [blog.gitee.com](https://blog.gitee.com)
-3. 你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解码云上的优秀开源项目
-4. [GVP](https://gitee.com/gvp) 全称是码云最有价值开源项目，是码云综合评定出的优秀开源项目
-5. 码云官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6. 码云封面人物是一档用来展示码云会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+####注意事项
+1. 暂不支持分页，后面会加
+2. 推荐使用fontClass
