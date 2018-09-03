@@ -7,7 +7,7 @@ layui.define(['laypage', 'form'], function (exports) {
     }, _MOD = 'iconPicker',
         _this = this,
         $ = layui.jquery,
-        page = layui.laypage,
+        laypage = layui.laypage,
         form = layui.form,
         BODY = 'body',
         TIPS = '请选择图标';
@@ -24,7 +24,7 @@ layui.define(['laypage', 'form'], function (exports) {
             // 是否分页：true/false
             page = opts.page,
             // 每页显示数量
-            limit = 20,
+            limit = limit == null ? 12 : opts.limit,
             // 是否开启搜索：true/false
             search = opts.search == null ? true : opts.search,
             // 点击回调
@@ -39,6 +39,7 @@ layui.define(['laypage', 'form'], function (exports) {
             TITLE_ID = 'layui-select-title-' + tmp,
             ICON_BODY = 'layui-iconpicker-' + tmp,
             PICKER_BODY = 'layui-iconpicker-body-' + tmp,
+            PAGE_ID = 'layui-iconpicker-page-' + tmp,
             LIST_BOX = 'layui-iconpicker-list-box',
             selected = 'layui-form-selected',
             unselect = 'layui-unselect';
@@ -112,7 +113,8 @@ layui.define(['laypage', 'form'], function (exports) {
                         '<div class="'+ LIST_BOX +'"></div> '+
                      '</div>';
                 $('#' + ICON_BODY).find('.layui-anim').eq(0).html(bodyHtml);
-                a.search().createList();
+                a.search().createList().check().page();
+
                 return a;
             },
             /**
@@ -126,41 +128,105 @@ layui.define(['laypage', 'form'], function (exports) {
                     pageHtml = '',
                     listHtml = $('<div class="layui-iconpicker-list">')//'<div class="layui-iconpicker-list">';
 
-                // 判断是否分页 TODO
-                if (page){
-                    pageHtml = '<div class="layui-iconpicker-page">' +
-                        '' +
-                        '</div> ';
+                // 计算分页数据
+                var _limit = limit, // 每页显示数量
+                    _pages = l % _limit === 0 ? l / _limit : parseInt(l / _limit + 1), // 总计多少页
+                    _id = PAGE_ID;
 
+                // 图标列表
+                var c = 0,  //计数器：计算模糊查询时匹配到的数据量
+                    icons = [];
 
-                    listHtml += '</div> ';
-                } else {
-                    var c = 0;
-                    for (var i = 0; i < l; i++) {
-                        var obj = d[i];
-                        // 判断是否模糊查询
-                        if (text && obj.indexOf(text) === -1) {
-                            c++;
-                            continue;
-                        }
-                        var m = $('<div class="layui-iconpicker-icon-item" title="'+ obj +'">');
-                        if (isFontClass){
-                            m.append('<i class="layui-icon '+ obj +'"></i>');
-                        } else {
-                            m.append($('<i class="layui-icon">').html(obj.replace('amp;', '')));//'<i class="layui-icon">'+ obj +'</i>';
-                        }
-                        listHtml.append(m);
+                for (var i = 0; i < l; i++) {
+                    var obj = d[i];
+
+                    // 判断是否模糊查询
+                    if (text && obj.indexOf(text) === -1) {
+                        c++;
+                        continue;
                     }
 
-                    // 无数据
-                    if (c === l) {
-                        listHtml.append('<p class="layui-iconpicker-tips">无数据</p>');
+                    // 每个图标dom
+                    var icon = '<div class="layui-iconpicker-icon-item" title="'+ obj +'">';
+                    if (isFontClass){
+                        icon += '<i class="layui-icon '+ obj +'"></i>';
+                    } else {
+                        icon += '<i class="layui-icon">'+ obj.replace('amp;', '') +'</i>';
                     }
+                    icon += '</div>';
 
+                    icons.push(icon);
                 }
 
+                // 查询出图标后再分页
+                l = icons.length;
+                _pages = l % _limit === 0 ? l / _limit : parseInt(l / _limit + 1);
+                for (var i = 0; i < _pages; i++) {
+                    // 按limit分块
+                    var lm = $('<div class="layui-iconpicker-icon-limit" id="layui-iconpicker-icon-limit-'+ (i+1) +'">');
+
+                    for (var j = i * _limit; j < (i+1) * _limit && j < l; j++) {
+                        lm.append(icons[j]);
+                    }
+
+                    listHtml.append(lm);
+                }
+
+                // 无数据
+                if (c === l) {
+                    listHtml.append('<p class="layui-iconpicker-tips">无数据</p>');
+                }
+
+                // 判断是否分页
+                if (page){
+                    $('#' + PICKER_BODY).addClass('layui-iconpicker-body-page');
+                    pageHtml = '<div class="layui-iconpicker-page" id="'+ PAGE_ID +'">' +
+                        '<div class="layui-iconpicker-page-count">' +
+                        '<span id="'+ PAGE_ID +'-current">1</span>/' +
+                        '<span id="'+ PAGE_ID +'-pages">'+ _pages +'</span>' +
+                        ' (<span id="'+ PAGE_ID +'-length">'+ l +'</span>)' +
+                        '</div>' +
+                        '<div class="layui-iconpicker-page-operate">' +
+                        '<i class="layui-icon" id="'+ PAGE_ID +'-prev" data-index="0" prev>&#xe603;</i> ' +
+                        '<i class="layui-icon" id="'+ PAGE_ID +'-next" data-index="2" next>&#xe602;</i> ' +
+                        '</div>' +
+                        '</div>';
+                }
+
+
                 $('#' + ICON_BODY).find('.layui-anim').find('.' + LIST_BOX).html('').append(listHtml).append(pageHtml);
-                a.check();
+                return a;
+            },
+            // 分页
+            page: function () {
+                var icon = '#' + PAGE_ID + ' .layui-iconpicker-page-operate .layui-icon';
+
+                $(icon).unbind('click');
+                a.event('click', icon, function (e) {
+                   var elem = e.currentTarget,
+                       total = parseInt($('#' +PAGE_ID + '-pages').html()),
+                       isPrev = $(elem).attr('prev') !== undefined,
+                       // 按钮上标的页码
+                       index = parseInt($(elem).attr('data-index')),
+                       $cur = $('#' +PAGE_ID + '-current'),
+                       // 点击时正在显示的页码
+                       current = parseInt($cur.html());
+
+                    // 分页数据
+                    if (isPrev && current > 1) {
+                        current=current-1;
+                        $(icon + '[prev]').attr('data-index', current);
+                    } else if (!isPrev && current < total){
+                        current=current+1;
+                        $(icon + '[next]').attr('data-index', current);
+                    }
+                    $cur.html(current);
+
+                    // 图标数据
+                    $('.layui-iconpicker-icon-limit').hide();
+                    $('#layui-iconpicker-icon-limit-' + current).show();
+                    e.stopPropagation();
+                });
                 return a;
             },
             /**
@@ -204,11 +270,11 @@ layui.define(['laypage', 'form'], function (exports) {
                     }
 
                 });
+                return a;
             },
             event: function (evt, el, fn) {
                 $(BODY).on(evt, el, fn);
             }
-
         };
 
         var common = {
@@ -216,7 +282,7 @@ layui.define(['laypage', 'form'], function (exports) {
              * 加载样式表
              */
             loadCss: function () {
-                var css = '.layui-iconpicker .layui-anim{display:none;position:absolute;left:0;top:42px;padding:5px 0;z-index:899;min-width:100%;border:1px solid #d2d2d2;max-height:300px;overflow-y:auto;background-color:#fff;border-radius:2px;box-shadow:0 2px 4px rgba(0,0,0,.12);box-sizing:border-box;}.layui-iconpicker-item{border:1px solid #e6e6e6;width:90px;height:38px;border-radius:4px;cursor:pointer;position:relative;}.layui-iconpicker-icon{border-right:1px solid #e6e6e6;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;display:block;width:60px;height:100%;float:left;text-align:center;background:#fff;transition:all .3s;}.layui-iconpicker-icon i{line-height:38px;font-size:18px;}.layui-iconpicker-item > .layui-edge{left:70px;}.layui-iconpicker-item:hover{border-color:#D2D2D2!important;}.layui-iconpicker-item:hover .layui-iconpicker-icon{border-color:#D2D2D2!important;}.layui-iconpicker.layui-form-selected .layui-anim{display:block;}.layui-iconpicker-body{padding:6px;}.layui-iconpicker .layui-iconpicker-list{background-color:#fff;border:1px solid #ccc;border-radius:4px;}.layui-iconpicker .layui-iconpicker-icon-item{display:inline-block;width:21.1%;line-height:36px;text-align:center;cursor:pointer;vertical-align:top;height:36px;margin:4px;border:1px solid #ddd;border-radius:2px;transition:300ms;}.layui-iconpicker .layui-iconpicker-icon-item i.layui-icon{font-size:17px;}.layui-iconpicker .layui-iconpicker-icon-item:hover{background-color:#eee;border-color:#ccc;-webkit-box-shadow:0 0 2px #aaa,0 0 2px #fff inset;-moz-box-shadow:0 0 2px #aaa,0 0 2px #fff inset;box-shadow:0 0 2px #aaa,0 0 2px #fff inset;text-shadow:0 0 1px #fff;}.layui-iconpicker-search{position:relative;margin:0 0 6px 0;border:1px solid #e6e6e6;border-radius:2px;transition:300ms;}.layui-iconpicker-search:hover{border-color:#D2D2D2!important;}.layui-iconpicker-search .layui-input{cursor:text;display:inline-block;width:86%;border:none;padding-right:0;margin-top:1px;}.layui-iconpicker-search .layui-icon{position:absolute;top:11px;right:4%;}.layui-iconpicker-tips{text-align:center;padding:8px 0;cursor:not-allowed;}';
+                var css = '.layui-iconpicker .layui-anim{display:none;position:absolute;left:0;top:42px;padding:5px 0;z-index:899;min-width:100%;border:1px solid #d2d2d2;max-height:300px;overflow-y:auto;background-color:#fff;border-radius:2px;box-shadow:0 2px 4px rgba(0,0,0,.12);box-sizing:border-box;}.layui-iconpicker-item{border:1px solid #e6e6e6;width:90px;height:38px;border-radius:4px;cursor:pointer;position:relative;}.layui-iconpicker-icon{border-right:1px solid #e6e6e6;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;display:block;width:60px;height:100%;float:left;text-align:center;background:#fff;transition:all .3s;}.layui-iconpicker-icon i{line-height:38px;font-size:18px;}.layui-iconpicker-item > .layui-edge{left:70px;}.layui-iconpicker-item:hover{border-color:#D2D2D2!important;}.layui-iconpicker-item:hover .layui-iconpicker-icon{border-color:#D2D2D2!important;}.layui-iconpicker.layui-form-selected .layui-anim{display:block;}.layui-iconpicker-body{padding:6px;}.layui-iconpicker .layui-iconpicker-list{background-color:#fff;border:1px solid #ccc;border-radius:4px;}.layui-iconpicker .layui-iconpicker-icon-item{display:inline-block;width:21.1%;line-height:36px;text-align:center;cursor:pointer;vertical-align:top;height:36px;margin:4px;border:1px solid #ddd;border-radius:2px;transition:300ms;}.layui-iconpicker .layui-iconpicker-icon-item i.layui-icon{font-size:17px;}.layui-iconpicker .layui-iconpicker-icon-item:hover{background-color:#eee;border-color:#ccc;-webkit-box-shadow:0 0 2px #aaa,0 0 2px #fff inset;-moz-box-shadow:0 0 2px #aaa,0 0 2px #fff inset;box-shadow:0 0 2px #aaa,0 0 2px #fff inset;text-shadow:0 0 1px #fff;}.layui-iconpicker-search{position:relative;margin:0 0 6px 0;border:1px solid #e6e6e6;border-radius:2px;transition:300ms;}.layui-iconpicker-search:hover{border-color:#D2D2D2!important;}.layui-iconpicker-search .layui-input{cursor:text;display:inline-block;width:86%;border:none;padding-right:0;margin-top:1px;}.layui-iconpicker-search .layui-icon{position:absolute;top:11px;right:4%;}.layui-iconpicker-tips{text-align:center;padding:8px 0;cursor:not-allowed;}.layui-iconpicker-page{margin-top:6px;margin-bottom:-6px;font-size:12px;padding:0 2px;}.layui-iconpicker-page-count{display:inline-block;}.layui-iconpicker-page-operate{display:inline-block;float:right;cursor:default;}.layui-iconpicker-page-operate .layui-icon{font-size:12px;cursor:pointer;}.layui-iconpicker-body-page .layui-iconpicker-icon-limit{display:none;}.layui-iconpicker-body-page .layui-iconpicker-icon-limit:first-child{display:block;}';
                 $('head').append('<style rel="stylesheet">'+css+'</style>');
             },
             /**
