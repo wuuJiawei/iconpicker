@@ -1,9 +1,10 @@
 # LayUI拓展组件：IconPicker图标选择器
 
 #### 项目介绍
-基于Layui的图标选择器，支持查询、点击回调等功能，提供手动选择图标事件。注：图标来自于Layui2.4.1 
+基于Layui的图标选择器，支持查询、分页、点击回调等功能，提供手动选择图标事件。注：图标来自于Layui2.4.1 
 
 #### 效果图
+![输入图片说明](https://images.gitee.com/uploads/images/2018/0904/182114_7fbd07ab_1157021.gif "icon-a.gif")
 ![输入图片说明](https://images.gitee.com/uploads/images/2018/0830/235644_7c9ab176_1157021.gif "b.gif")
 ![输入图片说明](https://images.gitee.com/uploads/images/2018/0830/235651_a9f30be3_1157021.gif "c.gif")
 
@@ -24,6 +25,10 @@
                 type: 'fontClass',
                 // 是否开启搜索：true/false
                 search: true,
+                // 是否开启分页
+                page: true,
+                // 每页显示数量，默认12
+                limit: 12,
                 // 点击回调
                 click: function (data) {
                     console.log(data);
@@ -42,5 +47,4 @@
 
 
 #### 注意事项
-1. 暂不支持分页，后面会加
-2. 推荐使用fontClass
+1. 推荐使用fontClass
