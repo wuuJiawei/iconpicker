@@ -29,6 +29,8 @@ layui.define(['laypage', 'form'], function (exports) {
             search = opts.search == null ? true : opts.search,
             // 点击回调
             click = opts.click,
+            // 渲染成功后的回调
+            success = opts.success,
             // json数据
             data = {},
             // 唯一标识
@@ -50,7 +52,21 @@ layui.define(['laypage', 'form'], function (exports) {
 
                 a.hideElem().createSelect().createBody().toggleSelect();
                 common.loadCss();
+                
+                if (success) {
+                    success(this.successHandle());
+                }
+
                 return a;
+            },
+            successHandle: function(){
+                var d = {
+                    options: opts,
+                    data: data,
+                    id: tmp,
+                    elem: $('#' + ICON_BODY)
+                };
+                return d;
             },
             /**
              * 隐藏elem
