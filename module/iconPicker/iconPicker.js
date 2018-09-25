@@ -195,6 +195,15 @@ layui.define(['laypage', 'form'], function (exports) {
 
 
                 $('#' + ICON_BODY).find('.layui-anim').find('.' + LIST_BOX).html('').append(listHtml).append(pageHtml);
+                a.preventEvent();
+                return a;
+            },
+            // 阻止Layui的一些默认事件
+            preventEvent: function() {
+                var item = '#' + ICON_BODY + ' .layui-anim';
+                a.event('click', item, function (e) {
+                    e.stopPropagation();
+                });
                 return a;
             },
             // 分页
@@ -238,9 +247,6 @@ layui.define(['laypage', 'form'], function (exports) {
                     var elem = e.target,
                         t = $(elem).val();
                     a.createList(t);
-                });
-                a.event('click', item, function (e) {
-                    e.stopPropagation();
                 });
                 return a;
             },
