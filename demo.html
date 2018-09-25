@@ -12,9 +12,15 @@
 <body>
     <div class="layui-form">
         <div class="layui-form-item">
-            <label for="" class="layui-form-label">选择图标</label>
+            <label for="" class="layui-form-label">默认图标</label>
             <div class="layui-input-block">
                 <input type="text" id="iconPicker" lay-filter="iconPicker" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="" class="layui-form-label">自定义图标</label>
+            <div class="layui-input-block">
+                <input type="text" id="iconPicker2" value="layui-icon-face-smile-fine" lay-filter="iconPicker2" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -46,6 +52,27 @@
             iconPicker.render({
                 // 选择器，推荐使用input
                 elem: '#iconPicker',
+                // 数据类型：fontClass/unicode，推荐使用fontClass
+                type: 'fontClass',
+                // 是否开启搜索：true/false
+                search: true,
+                // 是否开启分页
+                page: true,
+                // 每页显示数量，默认12
+                limit: 12,
+                // 点击回调
+                click: function (data) {
+                    console.log(data);
+                },
+                // 渲染成功后的回调
+                success: function(d) {
+                    console.log(d);
+                }
+            });
+
+            iconPicker.render({
+                // 选择器，推荐使用input
+                elem: '#iconPicker2',
                 // 数据类型：fontClass/unicode，推荐使用fontClass
                 type: 'fontClass',
                 // 是否开启搜索：true/false

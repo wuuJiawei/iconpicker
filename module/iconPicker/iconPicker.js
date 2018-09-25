@@ -37,6 +37,8 @@ layui.define(['laypage', 'form'], function (exports) {
             tmp = new Date().getTime(),
             // 是否使用的class数据
             isFontClass = opts.type === 'fontClass',
+            // 初始化时input的值
+            ORIGINAL_ELEM_VALUE = $(elem).val(),
             TITLE = 'layui-select-title',
             TITLE_ID = 'layui-select-title-' + tmp,
             ICON_BODY = 'layui-iconpicker-' + tmp,
@@ -51,6 +53,7 @@ layui.define(['laypage', 'form'], function (exports) {
                 data = common.getData[type]();
 
                 a.hideElem().createSelect().createBody().toggleSelect();
+                a.preventEvent();
                 common.loadCss();
                 
                 if (success) {
@@ -79,11 +82,29 @@ layui.define(['laypage', 'form'], function (exports) {
              * 绘制select下拉选择框
              */
             createSelect: function () {
+                var oriIcon = '<i class="layui-icon">';
+                
+                // 默认图标
+                if(ORIGINAL_ELEM_VALUE === '') {
+                    if(isFontClass) {
+                        ORIGINAL_ELEM_VALUE = 'layui-icon-circle-dot';
+                    } else {
+                        ORIGINAL_ELEM_VALUE = '&#xe617;';
+                    }
+                }
+
+                if (isFontClass) {
+                    oriIcon = '<i class="layui-icon '+ ORIGINAL_ELEM_VALUE +'">';
+                } else {
+                    oriIcon += ORIGINAL_ELEM_VALUE; 
+                }
+                oriIcon += '</i>';
+
                 var selectHtml = '<div class="layui-iconpicker layui-unselect layui-form-select" id="'+ ICON_BODY +'">' +
                     '<div class="'+ TITLE +'" id="'+ TITLE_ID +'">' +
                         '<div class="layui-iconpicker-item">'+
                             '<span class="layui-iconpicker-icon layui-unselect">' +
-                                '<i class="layui-icon">&#xe617;</i>' +
+                                oriIcon +
                             '</span>'+
                             '<i class="layui-edge"></i>' +
                         '</div>'+
@@ -91,6 +112,7 @@ layui.define(['laypage', 'form'], function (exports) {
                     '<div class="layui-anim layui-anim-upbit" style="">' +
                         '123' +
                     '</div>';
+                console.log(selectHtml)
                 $(elem).after(selectHtml);
                 return a;
             },
@@ -211,7 +233,6 @@ layui.define(['laypage', 'form'], function (exports) {
 
 
                 $('#' + ICON_BODY).find('.layui-anim').find('.' + LIST_BOX).html('').append(listHtml).append(pageHtml);
-                a.preventEvent();
                 return a;
             },
             // 阻止Layui的一些默认事件
@@ -296,6 +317,11 @@ layui.define(['laypage', 'form'], function (exports) {
 
                 });
                 return a;
+            },
+            // 监听原始input数值改变
+            inputListen: function(){
+                var el = $(elem);
+                // TODO
             },
             event: function (evt, el, fn) {
                 $(BODY).on(evt, el, fn);
