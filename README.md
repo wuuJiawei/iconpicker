@@ -11,7 +11,12 @@
 #### 使用示例
 
 ```
-    <input type="text" id="iconPicker" lay-filter="iconPicker" class="layui-input">
+   默认图标：
+   <input type="text" id="iconPicker" lay-filter="iconPicker" class="layui-input">
+
+   自定义图标：
+   <input type="text" id="iconPicker2" value="layui-icon-face-smile-fine" lay-filter="iconPicker2" class="layui-input">
+
 ```
 
 ```
@@ -58,6 +63,7 @@ ps. iconPicker.js文件在module/iconPicker目录中
   - 修复点击搜索输入框后选择器关闭的bug
   - 添加渲染成功后的回调  
   - 其他的优化
+  - 支持修改默认图标：修改方式，给原始input添加value属性，需要与type保持统一
 
 #### 注意事项
 1. 推荐使用fontClass
