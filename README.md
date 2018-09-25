@@ -1,7 +1,7 @@
 # LayUI拓展组件：IconPicker图标选择器
 
 #### 项目介绍
-基于Layui的图标选择器，支持查询、分页、点击回调等功能，提供手动选择图标事件。注：图标来自于Layui2.4.1 
+基于Layui的图标选择器，支持查询、分页、点击回调、渲染成功后回调等功能，提供手动选择图标事件。注：图标来自于Layui2.4.1 
 
 #### 效果图
 ![输入图片说明](https://images.gitee.com/uploads/images/2018/0904/182114_7fbd07ab_1157021.gif "icon-a.gif")
@@ -33,6 +33,10 @@
                 click: function (data) {
                     console.log(data);
                 }
+                // 渲染成功后的回调
+                success: function(d) {
+                    console.log(d);
+                }
             });
 
             /**
@@ -52,6 +56,7 @@ ps. iconPicker.js文件在module/iconPicker目录中
   - 添加无数据提示
   - 修复下拉三角无法点击的bug
   - 修复点击搜索输入框后选择器关闭的bug
+  - 添加渲染成功后的回调  
   - 其他的优化
 
 #### 注意事项
